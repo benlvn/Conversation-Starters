@@ -8,14 +8,16 @@
 
 import UIKit
 
-class ConversationTopicsListController: UITableViewController {
+class ConversationTopicsListController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     var conversationTopics:[String:Bool] = [:]
+    
+    @IBOutlet weak var conversationStartersButton: UIButton!
+    @IBOutlet weak var tableView: UITableView!
     
     let fileNames = try? NSFileManager.defaultManager().contentsOfDirectoryAtPath(NSBundle.mainBundle().pathForResource("Conversation Topics", ofType: nil)!)
     
     override func viewDidLoad() {
-        
         super.viewDidLoad()
         for name in fileNames!{
             var tempName = name
@@ -26,7 +28,7 @@ class ConversationTopicsListController: UITableViewController {
         }
     }
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let cell = tableView.cellForRowAtIndexPath(indexPath)!
         if conversationTopics[cell.textLabel!.text!]!{
             conversationTopics[cell.textLabel!.text!] = false
@@ -34,13 +36,14 @@ class ConversationTopicsListController: UITableViewController {
             conversationTopics[cell.textLabel!.text!] = true
         }
         tableView.reloadData()
+        print(conversationTopics)
     }
     
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return conversationTopics.count
     }
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("Topic", forIndexPath: indexPath)
         
@@ -56,11 +59,20 @@ class ConversationTopicsListController: UITableViewController {
     }
     
     @IBAction func buttonPressed(sender: AnyObject) {
-        for key in conversationTopics.keys{
-            conversationTopics[key] = true
+        if sender.tag == 0 {
+            for key in conversationTopics.keys{
+                conversationTopics[key] = true
+            }
+            tableView.reloadData()
+        } else if sender.tag == 1 {
+            for key in conversationTopics.keys{
+                conversationTopics[key] = false
+            }
+            tableView.reloadData()
         }
-        tableView.reloadData()
+        
     }
+    
     
     func presentConversationStarter(starters:[String]){
         let randomIndex = Int(arc4random_uniform(UInt32(starters.count)))
@@ -103,5 +115,4 @@ class ConversationTopicsListController: UITableViewController {
         }
         
     }
-    
 }
